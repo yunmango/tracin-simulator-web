@@ -6,30 +6,46 @@ import { Card } from '@/components/ui/card'
 export function LightConditionPanel() {
   const { lightCondition, setLightCondition } = useSimulatorStore()
 
+  const getLightLabel = () => {
+    switch (lightCondition) {
+      case 'bright': return 'Bright Light'
+      case 'less': return 'Less Light'
+      case 'dark': return 'Dark'
+    }
+  }
+
   return (
     <Card className="flex flex-col p-4 rounded-none border-0 border-r flex-1">
       <h3 className="text-sm font-semibold mb-4">Light Condition</h3>
       <div className="flex flex-col gap-3">
         <div className="flex gap-2">
           <Button
-            onClick={() => setLightCondition('withLight')}
-            variant={lightCondition === 'withLight' ? 'default' : 'outline'}
+            onClick={() => setLightCondition('bright')}
+            variant={lightCondition === 'bright' ? 'default' : 'outline'}
             size="sm"
-            className="min-w-[90px]"
+            className="min-w-[70px]"
           >
-            With Light
+            Bright
           </Button>
           <Button
-            onClick={() => setLightCondition('withoutLight')}
-            variant={lightCondition === 'withoutLight' ? 'default' : 'outline'}
+            onClick={() => setLightCondition('less')}
+            variant={lightCondition === 'less' ? 'default' : 'outline'}
             size="sm"
-            className="min-w-[90px]"
+            className="min-w-[70px]"
           >
-            Without Light
+            Less
+          </Button>
+          <Button
+            onClick={() => setLightCondition('dark')}
+            variant={lightCondition === 'dark' ? 'default' : 'outline'}
+            size="sm"
+            className="min-w-[70px]"
+          >
+            Dark
           </Button>
         </div>
         <Label className="text-sm text-muted-foreground">
-          {lightCondition === 'withLight' ? 'With Light' : 'Without Light'}
+          {getLightLabel()}
         </Label>
       </div>
     </Card>

@@ -9,8 +9,8 @@ export function ControlPanel() {
     <div className="flex border-b bg-card w-full">
       <ZoneSettingsPanel />
       <InstallationHeightPanel />
-      <MocapModePanel />
       <LightConditionPanel />
+      <MocapModePanel />
     </div>
   )
 }

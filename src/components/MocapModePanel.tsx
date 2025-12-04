@@ -4,7 +4,9 @@ import { Label } from '@/components/ui/label'
 import { Card } from '@/components/ui/card'
 
 export function MocapModePanel() {
-  const { mocapMode, setMocapMode } = useSimulatorStore()
+  const { mocapMode, setMocapMode, lightCondition } = useSimulatorStore()
+
+  const isHandsOnDisabled = lightCondition !== 'bright'
 
   return (
     <Card className="flex flex-col p-4 rounded-none border-0 border-r flex-1">
@@ -23,9 +25,15 @@ export function MocapModePanel() {
             onClick={() => setMocapMode('handsOn')}
             variant={mocapMode === 'handsOn' ? 'default' : 'outline'}
             size="sm"
-            className="min-w-[90px]"
+            className="min-w-[90px] relative"
+            disabled={isHandsOnDisabled}
           >
             Hands On
+            {isHandsOnDisabled && (
+              <span className="absolute inset-0 flex items-center justify-center text-destructive font-bold text-lg">
+                ✕
+              </span>
+            )}
           </Button>
         </div>
         <Label className="text-sm text-muted-foreground">
