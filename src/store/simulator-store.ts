@@ -54,7 +54,14 @@ export const useSimulatorStore = create<SimulatorState>((set) => ({
       return { zoneSettings: newSettings }
     }),
   setInstallationHeight: (height) => set({ installationHeight: height }),
-  setMocapMode: (mode) => set({ mocapMode: mode }),
+  setMocapMode: (mode) =>
+    set((state) => {
+      // If switching to handsOn while light condition is dark, also switch light to bright
+      if (mode === 'handsOn' && state.lightCondition === 'dark') {
+        return { mocapMode: mode, lightCondition: 'bright' }
+      }
+      return { mocapMode: mode }
+    }),
   setLightCondition: (condition) =>
     set((state) => {
       // If switching to dark and mocap mode is handsOn, reset to bodyOnly
