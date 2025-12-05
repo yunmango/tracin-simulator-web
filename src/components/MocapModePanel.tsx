@@ -12,7 +12,7 @@ export function MocapModePanel() {
   const getModeDescription = () => {
     switch (mocapMode) {
       case 'setup':
-        return 'Setup Mode (T-Pose)'
+        return 'Setup Mode'
       case 'bodyOnly':
         return 'Body Only'
       case 'handsOn':

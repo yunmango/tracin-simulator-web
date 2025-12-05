@@ -4,7 +4,6 @@ import { useFBX } from '@react-three/drei'
 import { AnimationMixer, Object3D, SpotLight, MeshStandardMaterial } from 'three'
 import { useSimulatorStore } from '@/store/simulator-store'
 
-import michelleModel from '../assets/Michelle.fbx'
 import michelleComplicatedGesture from '../assets/Michelle_Comlicated_Gesture.fbx'
 import michelleSimpleGesture from '../assets/Michelle_Simple_Gesture.fbx'
 import michelleDancing from '../assets/Michelle_Dancing.fbx'
@@ -26,7 +25,7 @@ const spotlightSettings = {
 }
 
 export function MichelleModel() {
-  const baseFbx = useFBX(michelleModel)
+  const baseFbx = useFBX(michelleDancing)
   const complicatedGestureFbx = useFBX(michelleComplicatedGesture)
   const simpleGestureFbx = useFBX(michelleSimpleGesture)
   const dancingFbx = useFBX(michelleDancing)
