@@ -3,6 +3,7 @@ import { useFrame } from '@react-three/fiber'
 import { Line, Text } from '@react-three/drei'
 import { DoubleSide } from 'three'
 import { useSimulatorStore } from '@/store/simulator-store'
+import type { _ } from 'node_modules/tailwindcss/dist/colors-b_6i0Oi7'
 
 // Logo brand color - movin yellow
 const BRAND_COLOR = '#DCFF00'
@@ -101,8 +102,8 @@ function WidthChangeEffect({ width, isVisible, opacity, zoneCenter, halfLength }
   if (!isVisible) return null
   
   const y = 0.05
-  // Position at the back edge of zone (outside wireframe)
-  const z = zoneCenter - halfLength - 0.3
+  // Position at the front edge of zone (outside wireframe)
+  const z = zoneCenter + halfLength + 0.2
   const halfWidth = width / 2
   
   return (
@@ -121,15 +122,15 @@ function WidthChangeEffect({ width, isVisible, opacity, zoneCenter, halfLength }
       <ArrowHead position={[halfWidth, y, z]} rotation={[0, 0, -Math.PI / 2]} opacity={opacity} />
       {/* Width value text */}
       <Text
-        position={[0, 0.05, z - 0.3]}
+        position={[0, 0.05, z + 0.2]}
         rotation={[-Math.PI / 2, 0, 0]}
-        fontSize={0.25}
+        fontSize={0.2}
         color={BRAND_COLOR}
         anchorX="center"
         anchorY="middle"
         fillOpacity={opacity}
       >
-        W: {width.toFixed(1)}m
+        {width.toFixed(1)} m
       </Text>
     </group>
   )
@@ -149,7 +150,7 @@ function LengthChangeEffect({ length, isVisible, opacity, distance, width }: { l
   const endZ = centerZ - halfLength    // Back edge of zone
   
   // Position beside the wireframe (right edge + small offset)
-  const x = halfWidth + 0.3
+  const x = halfWidth + 0.2
   
   return (
     <group>
@@ -167,15 +168,15 @@ function LengthChangeEffect({ length, isVisible, opacity, distance, width }: { l
       <ArrowHead position={[x, y, endZ]} rotation={[-Math.PI / 2, 0, 0]} opacity={opacity} />
       {/* Length value text */}
       <Text
-        position={[x + 0.3, 0.05, centerZ]}
+        position={[x + 0.6, 0.05, centerZ]}
         rotation={[-Math.PI / 2, 0, 0]}
-        fontSize={0.25}
+        fontSize={0.2}
         color={BRAND_COLOR}
         anchorX="left"
         anchorY="middle"
         fillOpacity={opacity}
       >
-        L: {length.toFixed(1)}m
+        {length.toFixed(1)} m
       </Text>
     </group>
   )
@@ -186,8 +187,8 @@ function HeightChangeEffect({ height, isVisible, opacity, zoneCenter, halfWidth,
   if (!isVisible) return null
   
   // Position at the back-right corner of zone (outside wireframe)
-  const x = halfWidth + 0.3
-  const z = zoneCenter - halfLength - 0.3
+  const x = halfWidth + 0.1
+  const z = zoneCenter - halfLength - 0.1
   
   return (
     <group>
@@ -205,15 +206,15 @@ function HeightChangeEffect({ height, isVisible, opacity, zoneCenter, halfWidth,
       <ArrowHead position={[x, height, z]} rotation={[0, 0, 0]} opacity={opacity} />
       {/* Height value text */}
       <Text
-        position={[x + 0.3, height / 2, z]}
+        position={[x + 0.1, height / 2, z]}
         rotation={[0, 0, 0]}
-        fontSize={0.25}
+        fontSize={0.2}
         color={BRAND_COLOR}
         anchorX="left"
         anchorY="middle"
         fillOpacity={opacity}
       >
-        H: {height.toFixed(1)}m
+        {height.toFixed(1)} m
       </Text>
     </group>
   )
