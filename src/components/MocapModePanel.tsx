@@ -6,7 +6,8 @@ import { Card } from '@/components/ui/card'
 export function MocapModePanel() {
   const { mocapMode, setMocapMode, lightCondition } = useSimulatorStore()
 
-  const isHandsOnDisabled = lightCondition !== 'bright'
+  // Hands On is available for bright and less light conditions, disabled only for dark
+  const isHandsOnDisabled = lightCondition === 'dark'
 
   return (
     <Card className="flex flex-col p-4 rounded-none border-0 border-r flex-1">

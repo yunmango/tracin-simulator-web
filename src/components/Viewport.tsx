@@ -1,9 +1,12 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect, useMemo } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls, Grid, GizmoHelper, GizmoViewport, useGLTF, useFBX, Line, Text } from '@react-three/drei'
 import tracinModel from '../assets/tracin.glb'
 import michelleModel from '../assets/Michelle.fbx'
-import { DoubleSide } from 'three'
+import michelleComplicatedGesture from '../assets/Michelle_Comlicated_Gesture.fbx'
+import michelleSimpleGesture from '../assets/Michelle_Simple_Gesture.fbx'
+import michelleDancing from '../assets/Michelle_Dancing.fbx'
+import { DoubleSide, AnimationMixer } from 'three'
 import { useSimulatorStore } from '@/store/simulator-store'
 
 function TracinModel() {
@@ -12,12 +15,60 @@ function TracinModel() {
 }
 
 function MichelleModel() {
-  const fbx = useFBX(michelleModel)
-  const { zoneSettings } = useSimulatorStore()
+  const baseFbx = useFBX(michelleModel)
+  const complicatedGestureFbx = useFBX(michelleComplicatedGesture)
+  const simpleGestureFbx = useFBX(michelleSimpleGesture)
+  const dancingFbx = useFBX(michelleDancing)
+  
+  const { zoneSettings, mocapMode, lightCondition } = useSimulatorStore()
+  const mixerRef = useRef<AnimationMixer | null>(null)
+  
+  // Determine which animation to play based on mocapMode and lightCondition
+  const currentAnimation = useMemo(() => {
+    if (mocapMode === 'bodyOnly') {
+      // Body Only mode: always play dancing animation regardless of light condition
+      return dancingFbx.animations[0]
+    } else {
+      // Hands On mode: depends on light condition
+      if (lightCondition === 'bright') {
+        return complicatedGestureFbx.animations[0]
+      } else {
+        // 'less' light condition (dark is disabled for handsOn)
+        return simpleGestureFbx.animations[0]
+      }
+    }
+  }, [mocapMode, lightCondition, complicatedGestureFbx, simpleGestureFbx, dancingFbx])
+  
+  // Setup and update animation mixer
+  useEffect(() => {
+    if (baseFbx && currentAnimation) {
+      // Create new mixer for the model
+      const mixer = new AnimationMixer(baseFbx)
+      mixerRef.current = mixer
+      
+      // Play the current animation
+      const action = mixer.clipAction(currentAnimation)
+      action.reset()
+      action.play()
+      
+      return () => {
+        mixer.stopAllAction()
+        mixer.uncacheRoot(baseFbx)
+      }
+    }
+  }, [baseFbx, currentAnimation])
+  
+  // Update animation on each frame
+  useFrame((_, delta) => {
+    if (mixerRef.current) {
+      mixerRef.current.update(delta)
+    }
+  })
+  
   // FBX models are often in centimeters, scale down to meters
   // Position Michelle at distance from Tracin (which is at 0, 1.0, 0)
   // Michelle moves along the Z-axis based on distance setting
-  return <primitive object={fbx} scale={0.01} position={[0, 0, -zoneSettings.distance]} />
+  return <primitive object={baseFbx} scale={0.01} position={[0, 0, -zoneSettings.distance]} />
 }
 
 import type { LightCondition } from '@/store/simulator-store'
@@ -44,6 +95,9 @@ const lightSettings = {
   },
 }
 
+// Logo brand color - movin yellow
+const BRAND_COLOR = '#DCFF00'
+
 // Distance change effect - a glowing line on the floor (XZ plane)
 function DistanceChangeEffect({ distance, isVisible, opacity }: { distance: number; isVisible: boolean; opacity: number }) {
   if (!isVisible) return null
@@ -57,7 +111,7 @@ function DistanceChangeEffect({ distance, isVisible, opacity }: { distance: numb
       {/* Main distance line on floor */}
       <Line
         points={[startPos, endPos]}
-        color="#00ffff"
+        color={BRAND_COLOR}
         lineWidth={3}
         transparent
         opacity={opacity}
@@ -65,7 +119,7 @@ function DistanceChangeEffect({ distance, isVisible, opacity }: { distance: numb
       {/* Glowing effect - wider line behind */}
       <Line
         points={[startPos, endPos]}
-        color="#00ffff"
+        color={BRAND_COLOR}
         lineWidth={8}
         transparent
         opacity={opacity * 0.3}
@@ -73,18 +127,18 @@ function DistanceChangeEffect({ distance, isVisible, opacity }: { distance: numb
       {/* Distance indicator rings at both ends - flat on floor */}
       <mesh position={startPos} rotation={[-Math.PI / 2, 0, 0]}>
         <ringGeometry args={[0.15, 0.2, 32]} />
-        <meshBasicMaterial color="#00ffff" transparent opacity={opacity} side={DoubleSide} />
+        <meshBasicMaterial color={BRAND_COLOR} transparent opacity={opacity} side={DoubleSide} />
       </mesh>
       <mesh position={endPos} rotation={[-Math.PI / 2, 0, 0]}>
         <ringGeometry args={[0.15, 0.2, 32]} />
-        <meshBasicMaterial color="#00ffff" transparent opacity={opacity} side={DoubleSide} />
+        <meshBasicMaterial color={BRAND_COLOR} transparent opacity={opacity} side={DoubleSide} />
       </mesh>
       {/* Distance value text - positioned at midpoint of line, flat on floor */}
       <Text
         position={[0.3, 0.01, -distance / 2]}
         rotation={[-Math.PI / 2, 0, 0]}
         fontSize={0.25}
-        color="#00ffff"
+        color={BRAND_COLOR}
         anchorX="left"
         anchorY="middle"
         fillOpacity={opacity}

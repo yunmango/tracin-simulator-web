@@ -4,7 +4,9 @@ import { Label } from '@/components/ui/label'
 import { Card } from '@/components/ui/card'
 
 export function LightConditionPanel() {
-  const { lightCondition, setLightCondition } = useSimulatorStore()
+  const { lightCondition, setLightCondition, mocapMode } = useSimulatorStore()
+
+  const isDarkDisabled = mocapMode === 'handsOn'
 
   const getLightLabel = () => {
     switch (lightCondition) {
@@ -39,9 +41,15 @@ export function LightConditionPanel() {
             onClick={() => setLightCondition('dark')}
             variant={lightCondition === 'dark' ? 'default' : 'outline'}
             size="sm"
-            className="min-w-[70px]"
+            className="min-w-[70px] relative"
+            disabled={isDarkDisabled}
           >
             Dark
+            {isDarkDisabled && (
+              <span className="absolute inset-0 flex items-center justify-center text-destructive font-bold text-lg">
+                ✕
+              </span>
+            )}
           </Button>
         </div>
         <Label className="text-sm text-muted-foreground">
