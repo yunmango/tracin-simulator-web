@@ -75,14 +75,16 @@ export function Viewport() {
           enablePan={true}
           enableZoom={true}
           enableRotate={true}
-          minDistance={2}
-          maxDistance={50}
+          minDistance={3}
+          maxDistance={10}
+          minPolarAngle={0.01}
+          maxPolarAngle={Math.PI - 0.01}
           makeDefault
         />
         
         <GizmoHelper
           alignment="bottom-right"
-          margin={[50, 50]}
+          margin={[100, 100]}
           renderOrder={2}
           onTarget={() => orbitControlsRef.current?.target}
           onUpdate={() => orbitControlsRef.current?.update()}
