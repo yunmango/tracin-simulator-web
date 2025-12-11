@@ -25,7 +25,6 @@ const spotlightSettings = {
 }
 
 export function MichelleModel() {
-  const baseFbx = useFBX(michelleDancing)
   const complicatedGestureFbx = useFBX(michelleComplicatedGesture)
   const simpleGestureFbx = useFBX(michelleSimpleGesture)
   const dancingFbx = useFBX(michelleDancing)
@@ -38,8 +37,8 @@ export function MichelleModel() {
   
   // Convert FBX materials to MeshStandardMaterial so they respond to lights
   useEffect(() => {
-    if (baseFbx) {
-      baseFbx.traverse((child) => {
+    if (dancingFbx) {
+      dancingFbx.traverse((child) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const mesh = child as any
         if (mesh.isMesh && mesh.material) {
@@ -55,7 +54,7 @@ export function MichelleModel() {
         }
       })
     }
-  }, [baseFbx])
+  }, [dancingFbx])
   
   // Determine which animation to play based on mocapMode and lightCondition
   const currentAnimation = useMemo(() => {
@@ -79,9 +78,9 @@ export function MichelleModel() {
   
   // Setup and update animation mixer
   useEffect(() => {
-    if (baseFbx && currentAnimation && !isSetupMode) {
+    if (dancingFbx && currentAnimation && !isSetupMode) {
       // Create new mixer for the model
-      const mixer = new AnimationMixer(baseFbx)
+      const mixer = new AnimationMixer(dancingFbx)
       mixerRef.current = mixer
       
       // Play the animation
@@ -91,13 +90,13 @@ export function MichelleModel() {
       
       return () => {
         mixer.stopAllAction()
-        mixer.uncacheRoot(baseFbx)
+        mixer.uncacheRoot(dancingFbx)
       }
     } else {
       // In setup mode, clear the mixer to show T-pose
       mixerRef.current = null
     }
-  }, [baseFbx, currentAnimation, isSetupMode])
+  }, [dancingFbx, currentAnimation, isSetupMode])
   
   // Setup spotlight target - must add target to scene
   useEffect(() => {
@@ -124,7 +123,7 @@ export function MichelleModel() {
   // Michelle moves along the Z-axis based on distance setting
   return (
     <group>
-      <primitive object={baseFbx} scale={0.01} position={michellePosition} />
+      <primitive object={dancingFbx} scale={0.01} position={michellePosition} />
       
       {/* Target object for spotlight - positioned at Michelle's center (waist height) */}
       <object3D ref={targetRef} position={[michellePosition[0], michellePosition[1] + 1, michellePosition[2]]} />
