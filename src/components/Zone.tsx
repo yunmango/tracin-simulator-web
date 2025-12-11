@@ -208,8 +208,8 @@ function HeightChangeEffect({ height, isVisible, opacity, zoneCenter, halfWidth,
   if (!isVisible) return null
   
   // Position at the back-right corner of zone (outside wireframe)
-  const x = halfWidth + 0.1
-  const z = zoneCenter - halfLength - 0.1
+  const x = halfWidth + 0.2
+  const z = zoneCenter + halfLength
   
   return (
     <group>

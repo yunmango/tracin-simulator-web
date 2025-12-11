@@ -6,6 +6,9 @@ import { useSimulatorStore } from '@/store/simulator-store'
 import { TracinModel } from './TracinModel'
 import { TrussModel } from './TrussModel'
 import { MichelleModel } from './MichelleModel'
+import { MountModel } from './MountModel'
+import { TripodModel } from './TripodModel'
+import { FadeGroup } from './FadeGroup'
 import { Zone } from './Zone'
 import { SceneLighting, lightSettings } from './SceneLighting'
 import { CameraController } from './CameraController'
@@ -16,7 +19,8 @@ export function Viewport() {
   const orbitControlsRef = useRef<any>(null)
   const { lightCondition, mocapMode, zoneSettings, installationHeight } = useSimulatorStore()
   const settings = lightSettings[lightCondition]
-  const trussVisible = installationHeight === 'ceiling'
+  const isTripodMode = installationHeight === 'tripod'
+  const isCeilingMode = installationHeight === 'ceiling'
   
   return (
     <div className="flex-1 min-h-0 bg-background relative">
@@ -54,22 +58,24 @@ export function Viewport() {
               side={DoubleSide}
             />
           
+          {/* Tripod Mode Group - Tracin on Tripod */}
+          <FadeGroup visible={isTripodMode}>
+            <TracinModel position={[-0.02, 1.0, -0.1]} rotation={[0, Math.PI, 0]} scale={0.0015} />
+            <TripodModel position={[0, 0.9, 0]} rotation={[Math.PI / 2, 0, Math.PI / 6]} scale={0.8} />
+          </FadeGroup>
+          
+          {/* Ceiling Mode Group - Tracin on Mount with Truss */}
+          <FadeGroup visible={isCeilingMode}>
+            <TracinModel position={[-0.02, 1.65, -0.2]} rotation={[-Math.PI / 6, Math.PI, 0]} scale={0.0015} />
+            <MountModel position={[-0.18, 2.4, 0.55]} rotation={[0, Math.PI / 2, -Math.PI / 1.8]} scale={3} />
+            <TrussModel position={[0.0, 1.55, -3.5]} rotation={[0, 0, 0]} scale={1} color="#777777" />
+          </FadeGroup>
+          
           {/* Zone (includes visualization and dimension effects) */}
           <Zone />
           
-          {/* Tracin 3D Model */}
-          <TracinModel />
-          
           {/* Michelle Character Model (A-Pose) */}
           <MichelleModel />
-          
-          {/* Truss Models Group - Only visible in Ceiling mode */}
-          <group>
-            <TrussModel position={[2.5, 1.5,-0.5]} rotation={[0, 0, Math.PI / 2]} scale={2.5} color="#999999" visible={trussVisible} />
-            <TrussModel position={[-2.5, 1.5, -0.5]} rotation={[0, 0, Math.PI / 2]} scale={2.5} color="#999999" visible={trussVisible} />
-            <TrussModel position={[2.5, 1.5, -6.5]} rotation={[0, 0, Math.PI / 2]} scale={2.5} color="#999999" visible={trussVisible} />
-            <TrussModel position={[-2.5, 1.5, -6.5]} rotation={[0, 0, Math.PI / 2]} scale={2.5} color="#999999" visible={trussVisible} />
-          </group>
           
           {/* Camera controller for zoom animations */}
           <CameraController 
@@ -104,6 +110,7 @@ export function Viewport() {
           <GizmoViewport axisColors={['#ef4444', '#22c55e', '#3b82f6']} labelColor="white" />
         </GizmoHelper>
       </Canvas>
+
       <Loader 
         containerStyles={{
           position: 'absolute',
