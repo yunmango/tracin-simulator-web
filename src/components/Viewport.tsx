@@ -4,15 +4,14 @@ import { OrbitControls, Grid, GizmoHelper, GizmoViewport, Loader } from '@react-
 import { DoubleSide } from 'three'
 import { useSimulatorStore, DEFAULT_CAMERA_POSITION, DEFAULT_TARGET } from '@/store/simulator-store'
 import { TracinModel } from './TracinModel'
+import { TripodModel } from './TripodModel'
 import { TrussModel } from './TrussModel'
 import { MichelleModel } from './MichelleModel'
 import { MountModel } from './MountModel'
-import { TripodModel } from './TripodModel'
 import { FadeGroup } from './FadeGroup'
 import { Zone } from './Zone'
 import { SceneLighting, lightSettings } from './SceneLighting'
 import { CameraController } from './CameraController'
-// import { CameraPositionDisplay } from './CameraPositionDisplay'
 
 export function Viewport() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -23,7 +22,7 @@ export function Viewport() {
   const isCeilingMode = installationHeight === 'ceiling'
   
   return (
-    <div className="flex-1 min-h-0 bg-background relative">
+    <div className="h-[55vh] md:h-full md:flex-[1366] flex-1 min-w-0 min-h-0 bg-slate-900 relative">
       <Canvas
         camera={{
           position: [DEFAULT_CAMERA_POSITION.x, DEFAULT_CAMERA_POSITION.y, DEFAULT_CAMERA_POSITION.z],
@@ -60,8 +59,7 @@ export function Viewport() {
           
           {/* Tripod Mode Group - Tracin on Tripod */}
           <FadeGroup visible={isTripodMode}>
-            <TracinModel position={[-0.02, 1.0, -0.1]} rotation={[0, Math.PI, 0]} scale={0.0015} />
-            <TripodModel position={[0, 0.9, 0]} rotation={[Math.PI / 2, 0, Math.PI / 6]} scale={0.8} />
+            <TripodModel position={[0, 0, 0]} rotation={[0, 0, 0]} scale={1} />
           </FadeGroup>
           
           {/* Ceiling Mode Group - Tracin on Mount with Truss */}
@@ -85,9 +83,6 @@ export function Viewport() {
             orbitControlsRef={orbitControlsRef}
           />
         </Suspense>
-        
-        {/* Temporary camera position display */}
-        {/* <CameraPositionDisplay /> */}
         
         <OrbitControls
           ref={orbitControlsRef}

@@ -1,6 +1,7 @@
 import { type LightCondition } from '@/store/simulator-store'
 
 // Light settings for each condition
+// eslint-disable-next-line react-refresh/only-export-components
 export const lightSettings = {
   bright: {
     ambient: 0.5,
