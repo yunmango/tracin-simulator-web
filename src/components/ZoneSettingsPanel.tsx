@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { 
   useSimulatorStore, 
   type ZoneSettings as ZoneSettingsType, 
@@ -20,13 +21,69 @@ interface DimensionSliderProps {
 }
 
 function DimensionSlider({ label, value, onChange, min = 0, max }: DimensionSliderProps) {
+  const [isEditing, setIsEditing] = useState(false)
+  const [inputValue, setInputValue] = useState(value.toFixed(1))
+
+  const handleBlur = () => {
+    const newValue = parseFloat(inputValue)
+    if (!isNaN(newValue) && newValue >= (min || 0) && newValue <= (max || 100)) {
+      onChange(newValue)
+    } else {
+      // Invalid value, revert to current value
+      setInputValue(value.toFixed(1))
+    }
+    setIsEditing(false)
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleBlur()
+    } else if (e.key === 'Escape') {
+      setInputValue(value.toFixed(1))
+      setIsEditing(false)
+    }
+  }
+
+  const handleClick = () => {
+    setIsEditing(true)
+    setInputValue(value.toFixed(1))
+  }
+
   return (
     <div className="flex flex-col gap-2.5 min-w-0">
-      <div className="flex items-center justify-between">
-        <Label className="text-base font-medium text-neutral-900">
+      <div className="flex items-center justify-between gap-4">
+        <Label className="text-base font-medium text-neutral-900 flex-shrink-0">
           {label}
         </Label>
-        <span className="text-base font-medium text-neutral-900">{value.toFixed(1)} m</span>
+        <div className="flex items-center gap-[2px] flex-shrink-0">
+          {isEditing ? (
+            <div className="bg-[#F5F5F5] rounded-lg py-[3px] px-[7px]">
+              <input
+                type="number"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onBlur={handleBlur}
+                onKeyDown={handleKeyDown}
+                autoFocus
+                min={min}
+                max={max}
+                step={0.1}
+                className="w-16 text-base font-medium text-black text-left bg-transparent outline-none"
+              />
+            </div>
+          ) : (
+            <div 
+              onClick={handleClick}
+              className="bg-[#F5F5F5] rounded-lg py-[3px] px-[7px] cursor-pointer hover:bg-[#EBEBEB] transition-colors"
+              title="Click to edit"
+            >
+              <span className="text-base font-medium text-black whitespace-nowrap">
+                {value.toFixed(1)}
+              </span>
+            </div>
+          )}
+          <span className="text-base font-medium text-black">m</span>
+        </div>
       </div>
       <div className="flex items-center gap-2.5">
         <span className="text-xs text-gray-300">{min?.toFixed(1)}</span>
@@ -52,18 +109,18 @@ export function ZoneSettingsPanel() {
   }
 
   return (
-    <Card className="flex flex-col gap-[4px] md:gap-6 px-4 md:px-[69px] pt-0 pb-4 rounded-none border-0 border-b shadow-none bg-white">
-      <div className="mb-0 flex items-baseline gap-2 md:block md:space-y-1">
-        <h3 className="text-[13px] md:text-xl font-semibold text-[#1A1A1A] tracking-tight leading-none">
+    <Card className="flex flex-col gap-[4px] xl:gap-6 px-4 xl:px-[69px] pt-0 pb-4 rounded-none border-0 border-b shadow-none bg-white">
+      <div className="mb-0 flex items-baseline gap-2 xl:block xl:space-y-1">
+        <h3 className="text-[13px] xl:text-xl font-semibold text-[#1A1A1A] tracking-tight leading-none">
           Zone Setting
         </h3>
-        <p className="text-[8px] md:text-xs text-[#BFBFBF] tracking-normal font-normal leading-[8px] md:leading-tight">
+        <p className="text-[8px] xl:text-xs text-[#BFBFBF] tracking-normal font-normal leading-[8px] xl:leading-tight">
           *The Distance value affects both Width and Length.
         </p>
       </div>
       
-      {/* Mobile: 2x2 Grid (always 2 columns on mobile to match spec) */}
-      <div className="grid grid-cols-2 gap-4 md:hidden">
+      {/* Mobile/Tablet: 2x2 Grid (always 2 columns on mobile/tablet to match spec) */}
+      <div className="grid grid-cols-2 gap-4 xl:hidden">
         <DimensionSlider
           label="Distance"
           value={zoneSettings.distance}
@@ -95,7 +152,7 @@ export function ZoneSettingsPanel() {
       </div>
       
       {/* Desktop: 1 + 3 layout */}
-      <div className="hidden md:grid grid-cols-2 gap-x-8 items-start">
+      <div className="hidden xl:grid grid-cols-2 gap-x-8 items-start">
         <div className="flex flex-col">
           <DimensionSlider
             label="Distance"

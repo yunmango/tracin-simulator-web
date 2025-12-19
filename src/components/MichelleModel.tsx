@@ -4,6 +4,7 @@ import { useFBX } from '@react-three/drei'
 import { type ColorRepresentation, type Material, type Texture, AnimationMixer, Mesh, MeshStandardMaterial, Object3D, SpotLight } from 'three'
 import { useSimulatorStore } from '@/store/simulator-store'
 
+// TODO: Replace with different animation files when ready
 import neoMovinManSetup from '../assets/NeoMOVINMan.fbx'
 import neoMovinManBodyOnly from '../assets/NeoMOVINMan.fbx'
 import neoMovinManHandsOn from '../assets/NeoMOVINMan.fbx'
@@ -25,11 +26,25 @@ const spotlightSettings = {
 }
 
 export function MichelleModel() {
-  const setupFbx = useFBX(neoMovinManSetup)
-  const bodyOnlyFbx = useFBX(neoMovinManBodyOnly)
-  const handsOnFbx = useFBX(neoMovinManHandsOn)
-  
   const { zoneSettings, lightCondition, mocapMode } = useSimulatorStore()
+  
+  // Conditionally select FBX based on mocapMode (loads only the needed one)
+  const fbxUrl = useMemo(() => {
+    switch (mocapMode) {
+      case 'setup':
+        return neoMovinManSetup
+      case 'bodyOnly':
+        return neoMovinManBodyOnly
+      case 'handsOn':
+        return neoMovinManHandsOn
+      default:
+        return neoMovinManSetup
+    }
+  }, [mocapMode])
+  
+  // Load only the FBX for the current mode
+  const fbx = useFBX(fbxUrl)
+  
   const isSetupMode = mocapMode === 'setup'
   const spotlightRef = useRef<SpotLight>(null)
   const targetRef = useRef<Object3D>(null)
@@ -37,67 +52,52 @@ export function MichelleModel() {
 
   // Convert FBX materials to MeshStandardMaterial so they respond to lights
   useEffect(() => {
+    if (!fbx) return
+
     type MaterialLike = Material & {
       map?: Texture | null
       color?: ColorRepresentation
     }
 
-    const convertMaterials = (fbx: Object3D | null | undefined) => {
-      if (!fbx) return
+    fbx.traverse((child) => {
+      const mesh = child as Mesh
+      if (!mesh.isMesh || !mesh.material || !mesh.geometry) return
 
-      fbx.traverse((child) => {
-        const mesh = child as Mesh
-        if (!mesh.isMesh || !mesh.material || !mesh.geometry) return
+      try {
+        const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
+        const hasUV = Boolean(mesh.geometry.getAttribute('uv'))
 
-        try {
-          const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
-          const hasUV = Boolean(mesh.geometry.getAttribute('uv'))
+        const newMaterials = materials.map((oldMaterial) => {
+          const old = oldMaterial as MaterialLike
 
-          const newMaterials = materials.map((oldMaterial) => {
-            const old = oldMaterial as MaterialLike
-
-            return new MeshStandardMaterial({
-              map: hasUV ? (old.map ?? null) : null,
-              color: old.color ?? 0xffffff,
-              roughness: 0.7,
-              metalness: 0.1,
-            })
+          return new MeshStandardMaterial({
+            map: hasUV ? (old.map ?? null) : null,
+            color: old.color ?? 0xffffff,
+            roughness: 0.7,
+            metalness: 0.1,
           })
+        })
 
-          mesh.material = Array.isArray(mesh.material) ? newMaterials : newMaterials[0]
-        } catch {
-          // Material conversion failed, skip this mesh
-        }
-      })
-    }
-    
-    convertMaterials(setupFbx)
-    convertMaterials(bodyOnlyFbx)
-    convertMaterials(handsOnFbx)
-  }, [setupFbx, bodyOnlyFbx, handsOnFbx])
+        mesh.material = Array.isArray(mesh.material) ? newMaterials : newMaterials[0]
+      } catch {
+        // Material conversion failed, skip this mesh
+      }
+    })
+  }, [fbx])
   
-  // Determine which FBX and animation to use based on mocapMode and lightCondition
-  const { currentFbx, currentAnimation } = useMemo(() => {
-    if (mocapMode === 'setup') {
-      return { currentFbx: setupFbx, currentAnimation: null }
-    } else if (mocapMode === 'bodyOnly') {
-      return { 
-        currentFbx: bodyOnlyFbx, 
-        currentAnimation: bodyOnlyFbx.animations[0] || null 
-      }
-    } else {
-      // handsOn mode
-      return { 
-        currentFbx: handsOnFbx, 
-        currentAnimation: handsOnFbx.animations[0] || null 
-      }
+  // Determine animation to use based on mocapMode
+  const currentAnimation = useMemo(() => {
+    if (mocapMode === 'setup' || !fbx.animations || fbx.animations.length === 0) {
+      return null
     }
-  }, [mocapMode, setupFbx, bodyOnlyFbx, handsOnFbx])
+    // Use the first animation for both bodyOnly and handsOn modes
+    return fbx.animations[0]
+  }, [mocapMode, fbx])
   
   // Setup and update animation mixer
   useEffect(() => {
-    if (currentFbx && currentAnimation && !isSetupMode) {
-      const mixer = new AnimationMixer(currentFbx)
+    if (fbx && currentAnimation && !isSetupMode) {
+      const mixer = new AnimationMixer(fbx)
       mixerRef.current = mixer
       
       const action = mixer.clipAction(currentAnimation)
@@ -106,12 +106,12 @@ export function MichelleModel() {
       
       return () => {
         mixer.stopAllAction()
-        mixer.uncacheRoot(currentFbx)
+        mixer.uncacheRoot(fbx)
       }
     } else {
       mixerRef.current = null
     }
-  }, [currentFbx, currentAnimation, isSetupMode])
+  }, [fbx, currentAnimation, isSetupMode])
 
   // Setup spotlight target - must add target to scene
   useEffect(() => {
@@ -134,7 +134,7 @@ export function MichelleModel() {
   // FBX models are often in centimeters, scale down to meters
   return (
     <group>
-      <primitive object={currentFbx} scale={0.01} position={characterPosition} />
+      <primitive object={fbx} scale={0.01} position={characterPosition} />
 
       {/* Spotlight target at waist height */}
       <object3D ref={targetRef} position={[characterPosition[0], characterPosition[1] + 1, characterPosition[2]]} />

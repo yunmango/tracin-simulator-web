@@ -29,22 +29,22 @@ export function MocapModePanel({ className }: { className?: string }) {
   }
 
   return (
-    <Card className={cn("flex flex-col gap-[4px] md:gap-6 min-w-0 px-4 md:px-[69px] pt-4 pb-4 rounded-none border-0 border-b shadow-none bg-white md:flex-1", className)}>
-      <div className="mb-0 space-y-[4px] md:space-y-1">
-        <h3 className="text-[13px] md:text-xl font-semibold text-[#1A1A1A] tracking-tight leading-none whitespace-normal">Mocap Mode</h3>
-        <Label className="text-[8px] md:text-xs text-[#BFBFBF] tracking-normal font-normal leading-[8px] md:leading-tight">
+    <Card className={cn("flex flex-col gap-[4px] xl:gap-6 min-w-0 px-4 xl:px-[69px] pt-4 pb-4 rounded-none border-0 border-b shadow-none bg-white xl:flex-1", className)}>
+      <div className="mb-0 space-y-[4px] xl:space-y-1">
+        <h3 className="text-[13px] xl:text-xl font-semibold text-[#1A1A1A] tracking-tight leading-none whitespace-normal">Mocap Mode</h3>
+        <Label className="text-[8px] xl:text-xs text-[#BFBFBF] tracking-normal font-normal leading-[8px] xl:leading-tight">
           {getModeDescription()}
         </Label>
       </div>
-      <div className="flex w-full gap-0 md:gap-2 rounded-[16px] md:rounded-none overflow-hidden md:overflow-visible bg-[#f0f0f0] md:bg-transparent border border-[#e2e2e2] md:border-0 divide-x divide-[#e2e2e2] md:divide-x-0">
+      <div className="flex w-full gap-0 xl:gap-2 rounded-[16px] xl:rounded-none overflow-hidden xl:overflow-visible bg-[#f0f0f0] xl:bg-transparent border border-[#e2e2e2] xl:border-0 divide-x divide-[#e2e2e2] xl:divide-x-0">
         <Button
           onClick={() => setMocapMode('setup')}
           variant={mocapMode === 'setup' ? 'default' : 'outline'}
           className={cn(
-            "flex-1 flex-col gap-1 min-w-0 px-2 sm:px-5 text-[8px] md:text-base leading-none rounded-none md:rounded-[16px] border-0",
+            "flex-1 flex-col gap-1 min-w-0 px-2 sm:px-5 text-[8px] xl:text-[15px] leading-none rounded-none xl:rounded-[16px] border-0",
             mocapMode === 'setup'
               ? ""
-              : "bg-transparent hover:bg-[#e8e8e8] md:bg-[#f0f0f0] md:hover:bg-[#e8e8e8] md:border md:border-[#e2e2e2] md:rounded-[16px]"
+              : "bg-transparent hover:bg-[#e8e8e8] xl:bg-[#f0f0f0] xl:hover:bg-[#e8e8e8] xl:border xl:border-[#e2e2e2] xl:rounded-[16px]"
           )}
         >
           <img src={setupIcon} alt="Setup" className="w-5 h-5 pt-0.5" />
@@ -54,10 +54,10 @@ export function MocapModePanel({ className }: { className?: string }) {
           onClick={() => setMocapMode('bodyOnly')}
           variant={mocapMode === 'bodyOnly' ? 'default' : 'outline'}
           className={cn(
-            "flex-1 flex-col gap-1 min-w-0 px-2 sm:px-5 text-[8px] md:text-base leading-none rounded-none md:rounded-[16px] border-0",
+            "flex-1 flex-col gap-1 min-w-0 px-2 sm:px-5 text-[8px] xl:text-[15px] leading-none rounded-none xl:rounded-[16px] border-0",
             mocapMode === 'bodyOnly'
               ? ""
-              : "bg-transparent hover:bg-[#e8e8e8] md:bg-[#f0f0f0] md:hover:bg-[#e8e8e8] md:border md:border-[#e2e2e2] md:rounded-[16px]"
+              : "bg-transparent hover:bg-[#e8e8e8] xl:bg-[#f0f0f0] xl:hover:bg-[#e8e8e8] xl:border xl:border-[#e2e2e2] xl:rounded-[16px]"
           )}
         >
           <img src={bodyonlyIcon} alt="Body Only" className="w-5 h-5 pt-0.5" />
@@ -67,10 +67,10 @@ export function MocapModePanel({ className }: { className?: string }) {
           onClick={() => setMocapMode('handsOn')}
           variant={mocapMode === 'handsOn' ? 'default' : 'outline'}
           className={cn(
-            "flex-1 flex-col gap-1 relative min-w-0 px-2 sm:px-5 text-[8px] md:text-base leading-none rounded-none md:rounded-[16px] border-0",
+            "flex-1 flex-col gap-1 relative min-w-0 px-2 sm:px-5 text-[8px] xl:text-[15px] leading-none rounded-none xl:rounded-[16px] border-0",
             mocapMode === 'handsOn'
               ? ""
-              : "bg-transparent hover:bg-[#e8e8e8] md:bg-[#f0f0f0] md:hover:bg-[#e8e8e8] md:border md:border-[#e2e2e2] md:rounded-[16px]"
+              : "bg-transparent hover:bg-[#e8e8e8] xl:bg-[#f0f0f0] xl:hover:bg-[#e8e8e8] xl:border xl:border-[#e2e2e2] xl:rounded-[16px]"
           )}
           disabled={isHandsOnDisabled}
         >

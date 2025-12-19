@@ -30,11 +30,17 @@ interface SimulatorState {
   installationHeight: InstallationHeight
   mocapMode: MocapMode
   lightCondition: LightCondition
+
+  // 3D viewport overlays
+  isZoneLabelsPinned: boolean
+  isZonePointerDown: boolean
   
   setZoneSettings: (settings: Partial<ZoneSettings>) => void
   setInstallationHeight: (height: InstallationHeight) => void
   setMocapMode: (mode: MocapMode) => void
   setLightCondition: (condition: LightCondition) => void
+  setZoneLabelsPinned: (pinned: boolean) => void
+  setZonePointerDown: (down: boolean) => void
 }
 
 export const useSimulatorStore = create<SimulatorState>((set) => ({
@@ -47,6 +53,8 @@ export const useSimulatorStore = create<SimulatorState>((set) => ({
   installationHeight: 'tripod',
   mocapMode: 'setup',
   lightCondition: 'bright',
+  isZoneLabelsPinned: false,
+  isZonePointerDown: false,
   
   setZoneSettings: (settings) =>
     set((state) => {
@@ -81,5 +89,7 @@ export const useSimulatorStore = create<SimulatorState>((set) => ({
       }
       return { lightCondition: condition }
     }),
+  setZoneLabelsPinned: (pinned) => set({ isZoneLabelsPinned: pinned }),
+  setZonePointerDown: (down) => set({ isZonePointerDown: down }),
 }))
 

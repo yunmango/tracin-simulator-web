@@ -6,7 +6,7 @@ function App() {
   const [isPanelOpen, setIsPanelOpen] = useState(true)
 
   return (
-    <div className="flex flex-col md:flex-row h-screen w-screen overflow-hidden">
+    <div className="flex flex-col xl:flex-row h-screen w-screen overflow-hidden">
       <Viewport />
       <ControlPanel isOpen={isPanelOpen} onClose={() => setIsPanelOpen(false)} onOpen={() => setIsPanelOpen(true)} />
     </div>
