@@ -1,13 +1,12 @@
 import { useRef, useEffect, useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { useFBX } from '@react-three/drei'
-import { type ColorRepresentation, type Material, type Texture, AnimationMixer, Mesh, MeshStandardMaterial, Object3D, SpotLight } from 'three'
+import { AnimationMixer, Object3D, SpotLight, MeshStandardMaterial } from 'three'
 import { useSimulatorStore } from '@/store/simulator-store'
 
-// TODO: Replace with different animation files when ready
-import neoMovinManSetup from '../assets/NeoMOVINMan.fbx'
-import neoMovinManBodyOnly from '../assets/NeoMOVINMan.fbx'
-import neoMovinManHandsOn from '../assets/NeoMOVINMan.fbx'
+import michelleComplicatedGesture from '../assets/Michelle_Comlicated_Gesture.fbx'
+import michelleSimpleGesture from '../assets/Michelle_Simple_Gesture.fbx'
+import michelleDancing from '../assets/Michelle_Dancing.fbx'
 
 // Spotlight settings for each light condition
 const spotlightSettings = {
@@ -26,97 +25,84 @@ const spotlightSettings = {
 }
 
 export function MichelleModel() {
-  const { zoneSettings, lightCondition, mocapMode } = useSimulatorStore()
+  const complicatedGestureFbx = useFBX(michelleComplicatedGesture)
+  const simpleGestureFbx = useFBX(michelleSimpleGesture)
+  const dancingFbx = useFBX(michelleDancing)
   
-  // Conditionally select FBX based on mocapMode (loads only the needed one)
-  const fbxUrl = useMemo(() => {
-    switch (mocapMode) {
-      case 'setup':
-        return neoMovinManSetup
-      case 'bodyOnly':
-        return neoMovinManBodyOnly
-      case 'handsOn':
-        return neoMovinManHandsOn
-      default:
-        return neoMovinManSetup
-    }
-  }, [mocapMode])
-  
-  // Load only the FBX for the current mode
-  const fbx = useFBX(fbxUrl)
-  
+  const { zoneSettings, mocapMode, lightCondition } = useSimulatorStore()
   const isSetupMode = mocapMode === 'setup'
+  const mixerRef = useRef<AnimationMixer | null>(null)
   const spotlightRef = useRef<SpotLight>(null)
   const targetRef = useRef<Object3D>(null)
-  const mixerRef = useRef<AnimationMixer | null>(null)
-
+  
   // Convert FBX materials to MeshStandardMaterial so they respond to lights
   useEffect(() => {
-    if (!fbx) return
-
-    type MaterialLike = Material & {
-      map?: Texture | null
-      color?: ColorRepresentation
-    }
-
-    fbx.traverse((child) => {
-      const mesh = child as Mesh
-      if (!mesh.isMesh || !mesh.material || !mesh.geometry) return
-
-      try {
-        const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
-        const hasUV = Boolean(mesh.geometry.getAttribute('uv'))
-
-        const newMaterials = materials.map((oldMaterial) => {
-          const old = oldMaterial as MaterialLike
-
-          return new MeshStandardMaterial({
-            map: hasUV ? (old.map ?? null) : null,
-            color: old.color ?? 0xffffff,
+    if (dancingFbx) {
+      dancingFbx.traverse((child) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const mesh = child as any
+        if (mesh.isMesh && mesh.material) {
+          const oldMaterial = mesh.material
+          // Create a new standard material that responds to lights
+          const newMaterial = new MeshStandardMaterial({
+            map: oldMaterial.map || null,
+            color: oldMaterial.color || 0xffffff,
             roughness: 0.7,
             metalness: 0.1,
           })
-        })
-
-        mesh.material = Array.isArray(mesh.material) ? newMaterials : newMaterials[0]
-      } catch {
-        // Material conversion failed, skip this mesh
-      }
-    })
-  }, [fbx])
+          mesh.material = newMaterial
+        }
+      })
+    }
+  }, [dancingFbx])
   
-  // Determine animation to use based on mocapMode
+  // Determine which animation to play based on mocapMode and lightCondition
   const currentAnimation = useMemo(() => {
-    if (mocapMode === 'setup' || !fbx.animations || fbx.animations.length === 0) {
+    // Setup mode: no animation (T-pose)
+    if (mocapMode === 'setup') {
       return null
     }
-    // Use the first animation for both bodyOnly and handsOn modes
-    return fbx.animations[0]
-  }, [mocapMode, fbx])
+    if (mocapMode === 'bodyOnly') {
+      // Body Only mode: always play dancing animation regardless of light condition
+      return dancingFbx.animations[0]
+    } else {
+      // Hands On mode: depends on light condition
+      if (lightCondition === 'bright') {
+        return complicatedGestureFbx.animations[0]
+      } else {
+        // 'less' light condition (dark is disabled for handsOn)
+        return simpleGestureFbx.animations[0]
+      }
+    }
+  }, [mocapMode, lightCondition, complicatedGestureFbx, simpleGestureFbx, dancingFbx])
   
   // Setup and update animation mixer
   useEffect(() => {
-    if (fbx && currentAnimation && !isSetupMode) {
-      const mixer = new AnimationMixer(fbx)
+    if (dancingFbx && currentAnimation && !isSetupMode) {
+      // Create new mixer for the model
+      const mixer = new AnimationMixer(dancingFbx)
       mixerRef.current = mixer
       
+      // Play the animation
       const action = mixer.clipAction(currentAnimation)
       action.reset()
       action.play()
       
       return () => {
         mixer.stopAllAction()
-        mixer.uncacheRoot(fbx)
+        mixer.uncacheRoot(dancingFbx)
       }
     } else {
+      // In setup mode, clear the mixer to show T-pose
       mixerRef.current = null
     }
-  }, [fbx, currentAnimation, isSetupMode])
-
+  }, [dancingFbx, currentAnimation, isSetupMode])
+  
   // Setup spotlight target - must add target to scene
   useEffect(() => {
     if (spotlightRef.current && targetRef.current) {
       spotlightRef.current.target = targetRef.current
+      // The target must be added to the scene for the spotlight to work
       spotlightRef.current.target.updateMatrixWorld()
     }
   }, [zoneSettings.distance])
@@ -127,21 +113,25 @@ export function MichelleModel() {
       mixerRef.current.update(delta)
     }
   })
-
+  
+  // Get spotlight settings based on light condition
   const spotlight = spotlightSettings[lightCondition]
-  const characterPosition: [number, number, number] = [0, 0, -zoneSettings.distance]
-
+  const michellePosition: [number, number, number] = [0, 0, -zoneSettings.distance]
+  
   // FBX models are often in centimeters, scale down to meters
+  // Position Michelle at distance from Tracin (which is at 0, 1.0, 0)
+  // Michelle moves along the Z-axis based on distance setting
   return (
     <group>
-      <primitive object={fbx} scale={0.01} position={characterPosition} />
-
-      {/* Spotlight target at waist height */}
-      <object3D ref={targetRef} position={[characterPosition[0], characterPosition[1] + 1, characterPosition[2]]} />
-
+      <primitive object={dancingFbx} scale={0.01} position={michellePosition} />
+      
+      {/* Target object for spotlight - positioned at Michelle's center (waist height) */}
+      <object3D ref={targetRef} position={[michellePosition[0], michellePosition[1] + 1, michellePosition[2]]} />
+      
+      {/* Spotlight on Michelle - changes with light condition */}
       <spotLight
         ref={spotlightRef}
-        position={[characterPosition[0], characterPosition[1] + 5, characterPosition[2] + 3]}
+        position={[michellePosition[0], michellePosition[1] + 5, michellePosition[2] + 3]}
         intensity={spotlight.intensity}
         color={spotlight.color}
         angle={Math.PI / 5}

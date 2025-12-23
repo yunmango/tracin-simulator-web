@@ -27,7 +27,7 @@ export function Viewport() {
   }, [])
   
   return (
-    <div className="h-[55vh] xl:h-full xl:flex-[1366] flex-1 min-w-0 min-h-0 bg-slate-900 relative">
+    <div className="h-[55vh] lg:h-full flex-1 xl:flex-[1366] min-w-0 min-h-0 bg-slate-900 relative">
       <Canvas
         camera={{
           position: [DEFAULT_CAMERA_POSITION.x, DEFAULT_CAMERA_POSITION.y, DEFAULT_CAMERA_POSITION.z],
