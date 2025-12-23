@@ -369,7 +369,7 @@ function DimensionBadge({
           border: `2px solid ${BRAND_COLOR}`,
           background: 'rgba(0, 0, 0, 0.55)',
           color: BRAND_COLOR,
-          fontWeight: 700,
+          fontWeight: 600,
           // 모바일에서 크기 과도 문제: 뷰포트 기반으로 축소 가능하게 clamp 사용
           fontSize: 'clamp(10px, 2.8vw, 14px)',
           lineHeight: 'clamp(10px, 2.8vw, 14px)',
