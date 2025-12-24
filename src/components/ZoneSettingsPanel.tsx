@@ -50,9 +50,9 @@ function DimensionSlider({ label, value, onChange, min = 0, max }: DimensionSlid
   }
 
   return (
-    <div className="flex flex-col gap-2.5 min-w-0">
-      <div className="flex items-center justify-between gap-4">
-        <Label className="text-base font-semibold text-neutral-900 flex-shrink-0">
+    <div className="flex flex-col gap-2 lg:gap-2.5 min-w-0">
+      <div className="flex items-center justify-between gap-4 min-w-0">
+        <Label className="text-[13px] lg:text-base font-semibold text-neutral-900 min-w-0 truncate">
           {label}
         </Label>
         <div className="flex items-center gap-[2px] flex-shrink-0">
@@ -85,7 +85,7 @@ function DimensionSlider({ label, value, onChange, min = 0, max }: DimensionSlid
           <span className="text-[15px] font-semibold text-black">m</span>
         </div>
       </div>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-1.5 lg:gap-2">
         <Slider
           value={[value]}
           onValueChange={(values) => onChange(values[0])}
@@ -111,9 +111,9 @@ export function ZoneSettingsPanel() {
   }
 
   return (
-    <Card className="flex flex-col gap-[11px] lg:gap-[11px] px-4 lg:px-[69px] pt-0 lg:pt-0 pb-4 lg:pb-[33px] rounded-none border-0 border-b shadow-none bg-white">
+    <Card className="flex flex-col gap-2 lg:gap-[11px] px-4 lg:px-[69px] pt-0 lg:pt-0 pb-3 lg:pb-[8px] rounded-none border-0 border-b shadow-none bg-white">
       <div className="mb-0 flex items-baseline gap-2 lg:block lg:space-y-1">
-        <h3 className="text-[13px] lg:text-[24px] font-semibold text-[#1A1A1A] tracking-tight leading-none">
+        <h3 className="text-[13px] lg:text-[22px] font-semibold text-[#1A1A1A] tracking-tight leading-none">
           Zone Setting
         </h3>
         <p className="text-[8px] lg:text-[14px] text-[#BFBFBF] tracking-normal font-normal leading-[8px] lg:leading-tight">
@@ -122,7 +122,7 @@ export function ZoneSettingsPanel() {
       </div>
       
       {/* Mobile/Tablet: 2x2 Grid (always 2 columns on mobile/tablet to match spec) */}
-      <div className="grid grid-cols-2 gap-4 lg:hidden">
+      <div className="grid grid-cols-2 gap-3 lg:hidden">
         <DimensionSlider
           label="Distance"
           value={zoneSettings.distance}

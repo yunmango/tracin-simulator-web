@@ -15,9 +15,9 @@ export function ControlPanel({ isOpen = true, onClose, onOpen }: ControlPanelPro
   return (
     <>
       {/* Desktop: Always visible, Mobile/Tablet: Show when open */}
-      <div className={`${isOpen ? 'flex' : 'hidden lg:flex'} flex-col w-full min-w-0 lg:w-[45%] xl:w-auto xl:flex-[554] xl:min-w-0 h-[45vh] lg:h-full lg:border-l bg-white overflow-y-auto`}>
-        <div className="px-4 lg:px-[69px] pt-6 lg:pt-[101px] pb-6 lg:pb-6 bg-white relative">
-          <h1 className="text-[24px] lg:text-[40px] font-semibold text-[#1A1A1A] tracking-tight leading-tight">Visualization</h1>
+      <div className={`${isOpen ? 'flex' : 'hidden lg:flex'} flex-col w-full min-w-0 flex-1 lg:flex-none lg:w-[554px] lg:h-full lg:border-l bg-white overflow-y-auto overflow-x-hidden`}>
+        <div className="px-4 lg:px-[69px] pt-4 lg:pt-[43px] pb-4 lg:pb-[6px] bg-white relative">
+          <h1 className="text-[24px] lg:text-[28px] font-semibold text-[#1A1A1A] tracking-tight leading-tight">Visualization</h1>
           {/* Mobile/Tablet close button */}
           <button
             onClick={onClose}
@@ -37,7 +37,7 @@ export function ControlPanel({ isOpen = true, onClose, onOpen }: ControlPanelPro
           </div>
           
           {/* Mobile/Tablet: 2-column layout (Installation Height | Mocap Mode), LightCondition aligned to left column */}
-          <div className="grid grid-cols-2 lg:hidden min-w-0 px-4 gap-x-3 gap-y-1">
+          <div className="grid grid-cols-2 lg:hidden min-w-0 px-4 gap-x-4">
             <div className="min-w-0">
               <InstallationHeightPanel className="px-0" />
             </div>
